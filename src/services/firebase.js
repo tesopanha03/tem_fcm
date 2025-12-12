@@ -4,14 +4,28 @@ const path = require('path');
 
 // Initialize Firebase
 try {
-    // Resolve path relative to project root if needed, or assume absolute/relative to CWD
-    // Best to handle both. For now, we trust the env var or try to resolve it.
-    let serviceAccountPath = config.FIREBASE_KEY_PATH;
-    if (!path.isAbsolute(serviceAccountPath)) {
-        serviceAccountPath = path.resolve(process.cwd(), serviceAccountPath);
-    }
+    let serviceAccount;
 
-    const serviceAccount = require(serviceAccountPath);
+    if (config.FIREBASE_SERVICE_ACCOUNT_JSON) {
+        // Production: Load from Environment Variable
+        try {
+            serviceAccount = JSON.parse(config.FIREBASE_SERVICE_ACCOUNT_JSON);
+            console.log('Firebase initialized using FIREBASE_SERVICE_ACCOUNT_JSON environment variable');
+        } catch (e) {
+            console.error('Error parsing FIREBASE_SERVICE_ACCOUNT_JSON:', e.message);
+            throw e;
+        }
+    } else if (config.FIREBASE_KEY_PATH) {
+        // Local/Dev: Load from File Path
+        let serviceAccountPath = config.FIREBASE_KEY_PATH;
+        if (!path.isAbsolute(serviceAccountPath)) {
+            serviceAccountPath = path.resolve(process.cwd(), serviceAccountPath);
+        }
+        serviceAccount = require(serviceAccountPath);
+        console.log('Firebase initialized using file:', serviceAccountPath);
+    } else {
+        throw new Error('No Firebase credentials found (Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_KEY_PATH)');
+    }
 
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)

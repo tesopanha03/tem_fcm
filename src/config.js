@@ -6,6 +6,7 @@ const config = {
     POLL_INTERVAL: process.env.POLL_INTERVAL_MS || 5000,
     PORT: process.env.PORT || 3000,
     FIREBASE_SERVICE_ACCOUNT_JSON: process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
+    FIREBASE_KEY_PATH: process.env.FIREBASE_KEY_PATH,
     DB_HOST: process.env.DB_HOST,
     DB_USER: process.env.DB_USER,
     DB_PASS: process.env.DB_PASS,
